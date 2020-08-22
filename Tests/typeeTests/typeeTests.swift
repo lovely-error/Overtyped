@@ -24,6 +24,15 @@ final class typeeTests: XCTestCase {
         multiplier.beforeCall({_ in print ("happens after call")})
         multiplier.addPostcondition({$0 > 0})
         multiplier.addPostcondition({$0 > 0})
+        
+        struct Test {
+            @Function var uniqueExposer = { () -> (name: String, age: Int) in
+                return ("Joanne", 13)
+            }
+        }
+        let test = Test()
+        test.$uniqueExposer.addPostcondition({$0.name.count > 0 && $0.age > 0})
+        _ = test.$uniqueExposer <<! ()
     }
     
     

@@ -8,20 +8,28 @@
 import Foundation
 
 
+@propertyWrapper
 open class Function<Args, R> {
     
-    private var preconditions: Array<(Args) throws -> Bool> = []
+    private var preconditions: Array<(Args) -> Bool> = []
     private var preCalls: [(Args) -> Void] = []
-    private let function: (Args) throws -> R
-    private var postconditions: Array<(R) throws -> Bool> = []
+    private var function: (Args) throws -> R
+    private var postconditions: Array<(R) -> Bool> = []
     private var postCalls: [(Args) -> Void] = []
+    open var projectedValue: Function<Args, R> { return self }
+    public var wrappedValue: (Args) throws -> R {
+        get {
+            return self.invoke
+        }
+        set { function = newValue }
+    }
     public enum PredicateError: Error {
         case precondition((Args) throws -> Bool)
         case postcondition((R) throws -> Bool)
     }
 
-    public init(function: @escaping (Args) throws -> R){
-        self.function = function
+    public init(wrappedValue: @escaping (Args) throws -> R){
+        self.function = wrappedValue
     }
 
     internal func invoke(_ arg: Args) throws -> R {
@@ -36,12 +44,8 @@ open class Function<Args, R> {
         }
         
         for i in self.preconditions {
-            do {
-                if try i(arg) == false {
-                    throw PredicateError.precondition(i)
-                }
-            } catch let error {
-                throw error
+            if i(arg) == false {
+                throw PredicateError.precondition(i)
             }
         }
         
@@ -53,12 +57,8 @@ open class Function<Args, R> {
         }
         
         for i in self.postconditions {
-            do {
-                if try i(result) == false {
-                    throw PredicateError.postcondition(i)
-                }
-            } catch let error {
-                throw error
+            if i(result) == false {
+                throw PredicateError.postcondition(i)
             }
         }
         
