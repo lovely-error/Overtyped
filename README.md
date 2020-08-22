@@ -22,13 +22,14 @@ someProperty = "\(someProperty)"
 ```
 
 One particular usage is type transition enforcement.
+```
 protocol StatefulType { associatedtype State: Equatable; var currentState: State { get } }
 struct File: StatefullType { enum S: Equatable {case closed, opened}; var currentState: S }
 @Linear([{$0.currentState == .opened},{$0.currentState == .closed}]) 
 var fileToBeOpenedAndClosed: File = File.openForModification(fileAtPath: "...")
 fileToBeOpenedAndClosed.modifyContent { ... }
 //and after this point file must be closed
-
+```
 3. Refined types - they are essentially type predicates, and ensure that value of a type meet requirements. For example, a name field in user record may be set to start with capital letter, and be longer than certain amount of character or not contain nonallphabetic symbols.
 ```
 @Constrained(by: {$0 > 0 $$ $0 < 150}) var age: Int = 19
