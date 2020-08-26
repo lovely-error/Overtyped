@@ -1,7 +1,7 @@
 # typee
 
 We all love types, right? They allow us to capture errors early on and make our lifes more available to the rest of th great stuff out there.
-Indeed types are neat, and the types we all probably familiar with are the part of the Hindley-Milner type system of simply typed lambda calculus with polymorphisms, but while they definetly provide help, they are not what type systems and mathematical constructivism can offer. Namely, swift's property wrapper allow us to write the programm with more rigorous requirements and thus help us capture more bugs in our code. This library relies on these two constructs:
+Indeed types are neat, and the types we all probably familiar with are the part of the Hindley-Milner type system of simply typed lambda calculus with polymorphisms, but while they definetly provide help, they are not what type systems and mathematical constructivism can offer. Namely, swift's property wrapper allow us to write the programm with more rigorous requirements and thus help us capture more bugs in our code. This library relies on these constructs:
 1. Hoare functions - named after Tony Hoare, these functions allow you to specify preconditions - what your code should be before it gets into function - and postconditions - what your code should be after it gets out of the function. These cheks ensure that invariants are handled properly at type and subtype level.
 ```
 import Typee
@@ -41,5 +41,32 @@ age = 1_000_000 //fatal error. People doesnt live that long yet.
 use(rareMaterial) //ok
 useOnceMore(rareMaterial) //opps! its gone...
 ```
+6. Stateful types - which are represented by a state machine. Transitions are described as a directed graph and only mutations are conidered to trigger transitions.
+```
+@Stateful(configuration: {
+    var emptyString = Stateful<String>.State(
+        name: "empty string",
+        predicate: { value in
+            let a = value is String
+            let b = (value as! String).isEmpty
+            return a && b
+        },
+        validSuccsessors: [])
+    var nonEmptyString = Stateful<String>.State(
+        name: "non empty string",
+        predicate: { value in
+            let a = value is String
+            let b = !(value as! String).isEmpty
+            return a && b
+        },
+        validSuccsessors: [])
+    emptyString.addSuccesorState(nonEmptyString)
+    nonEmptyString.addSuccesorState(emptyString)
+    return Stateful.TransitionGraph(initialState: emptyString, setOfStates: [emptyString, nonEmptyString])
+}())
+var emptyHalfOfTheTime = ""
+```
+This is essentially ...
+
 
 The biggest problem with all this right now is the lack of propper messages when things go wrong. It is possible to fatalError() everywhere, but that is far from optimal for a library that wants to be a debbuging utility. Approches should be discussed. 
