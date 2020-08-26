@@ -122,3 +122,77 @@ public struct Linear<T> {
         self.wrappedValue = wrappedValue
     }
 }
+@propertyWrapper
+public struct Stateful<T> {
+    public final class State: Equatable, Hashable {
+//        enum SuccessorExpandingError: Error {
+//            case stateIsAlreadyAmongSuccessors
+//        }
+        let name: String
+        let predicate: (Any) -> Bool
+        private(set) var availableSuccsessors: Set<State>
+        public func addSuccesorState(_ state: State) /*throws*/ {
+            availableSuccsessors.insert(state)
+        }
+        public static func == (lhs: Stateful.State, rhs: Stateful.State) -> Bool {
+            return lhs.name == rhs.name
+        }
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(self.name)
+        }
+        init(name: String, predicate: @escaping (Any) -> Bool, validSuccsessors: Set<State>) {
+            self.name = name
+            self.predicate = predicate
+            self.availableSuccsessors = validSuccsessors
+        }
+    }
+    public struct TransitionGraph {
+        let initialState: State
+        let setOfStates: Set<State>
+    }
+    private var value: T
+    private(set) var transitionGraph: Set<State>
+    private(set) var currentState: State
+    public var wrappedValue: T {
+        get { value }
+        set {
+            var satisfied: Bool = false
+            var candidateTransition: State? = nil
+            for state in currentState.availableSuccsessors {
+                if state.predicate(newValue) {
+                    if satisfied == true {
+                        fatalError("""
+                        Found multiple possible next states for transition, but transitions must be deterministic,
+                            and thus contain only single valid transition.
+                            New value can become both \(candidateTransition!.name) and \(state.name)
+                        """)
+                    
+                    }
+                    satisfied = true
+                    candidateTransition = state
+                }
+            }
+            if satisfied {
+                self.value = newValue
+                self.currentState = candidateTransition!
+            } else {
+                fatalError("""
+                    The current state '\(currentState.name)' does not contain any available succesor states for the value '\(newValue)'.
+                    Expected to have one of the following: '\(currentState.availableSuccsessors.map({$0.name}))'
+                    """)
+            }
+        }
+    }
+    
+    public init(wrappedValue: T, configuration: TransitionGraph) {
+        self.currentState = configuration.initialState
+        if self.currentState.predicate(wrappedValue) {
+            self.value = wrappedValue
+        } else {
+            fatalError("""
+                Value '\(wrappedValue)' cannot be assigned, because it cannot be used to construct state '\(configuration.initialState.name)'.
+            """)
+        }
+        self.transitionGraph = configuration.setOfStates
+    }
+}

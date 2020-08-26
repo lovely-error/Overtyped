@@ -58,6 +58,29 @@ final class typeeTests: XCTestCase {
             
             @Unique
             var secret: String = "The Kennedy was killed by ..."
+            
+            @Stateful(configuration: {
+                var emptyString = Stateful<String>.State(
+                    name: "empty string",
+                    predicate: { value in
+                        let a = value is String
+                        let b = (value as! String).isEmpty
+                        return a && b
+                    },
+                    validSuccsessors: [])
+                var nonEmptyString = Stateful<String>.State(
+                    name: "non empty string",
+                    predicate: { value in
+                        let a = value is String
+                        let b = !(value as! String).isEmpty
+                        return a && b
+                    },
+                    validSuccsessors: [])
+                emptyString.addSuccesorState(nonEmptyString)
+                nonEmptyString.addSuccesorState(emptyString)
+                return Stateful.TransitionGraph(initialState: emptyString, setOfStates: [emptyString, nonEmptyString])
+            }())
+            var emptyHalfOfTheTime = ""
         }
         var test = Test()
         test.transition = Adulthood()
@@ -66,7 +89,31 @@ final class typeeTests: XCTestCase {
         
         _ = test.secret
         XCTAssert(test.$secret.isEmpty == true)
+        
+        //string status is representred as cycle
+        //with two states: one when it is empty,
+        //and one when it is not
+        test.emptyHalfOfTheTime = "Full"
+        test.emptyHalfOfTheTime = ""
+        test.emptyHalfOfTheTime = "Full"
+        test.emptyHalfOfTheTime = ""
     }
 
-    
+    func testActors () {
+        struct Mocha: ActorProtocol {
+            var messageQueue: DispatchQueue = .main
+            var id: UUID = .init()
+            
+            @Behaviour
+            var printYoAss = { () -> () in print("U ass") }
+        }
+        struct A {
+            @Actor var printer = Mocha()
+        }
+        //let actor = A()
+        //the bug with DispatchQueue makes this test always fail
+        //it was reported to swift's jira
+        //actor.printer.printYoAss(())
+
+    }
 }
