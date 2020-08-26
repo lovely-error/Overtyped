@@ -67,6 +67,6 @@ useOnceMore(rareMaterial) //opps! its gone...
 var emptyHalfOfTheTime = ""
 ```
 This is essentially ...
-
+![](/Users/tmarsh/Desktop/state-graph.png)
 
 The biggest problem with all this right now is the lack of propper messages when things go wrong. It is possible to fatalError() everywhere, but that is far from optimal for a library that wants to be a debbuging utility. Approches should be discussed. 
