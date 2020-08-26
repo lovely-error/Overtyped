@@ -9,7 +9,7 @@ let package = Package(
         // Products define the executables and libraries produced by a package, and make them visible to other packages.
         .library(
             name: "Typee",
-            targets: ["Typee"]),
+            targets: ["Typee", "Type Wrappers", "Function"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
