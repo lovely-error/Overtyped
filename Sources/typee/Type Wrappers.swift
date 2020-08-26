@@ -131,8 +131,10 @@ public struct Stateful<T> {
         let name: String
         let predicate: (Any) -> Bool
         private(set) var availableSuccsessors: Set<State>
-        public func addSuccesorState(_ state: State) /*throws*/ {
-            availableSuccsessors.insert(state)
+        public func addSuccesorState(_ state: State...) /*throws*/ {
+            state.forEach({ state in
+                availableSuccsessors.insert(state)
+            })
         }
         public static func == (lhs: Stateful.State, rhs: Stateful.State) -> Bool {
             return lhs.name == rhs.name
@@ -190,7 +192,7 @@ public struct Stateful<T> {
             self.value = wrappedValue
         } else {
             fatalError("""
-                Value '\(wrappedValue)' cannot be assigned, because it cannot be used to construct state '\(configuration.initialState.name)'.
+            Value '\(wrappedValue)' cannot be assigned, because it cannot be used to construct state '\(configuration.initialState.name)'.
             """)
         }
         self.transitionGraph = configuration.setOfStates
