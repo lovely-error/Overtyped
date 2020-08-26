@@ -122,40 +122,41 @@ public struct Linear<T> {
         self.wrappedValue = wrappedValue
     }
 }
-@propertyWrapper
-public struct Stateful<T> {
-    public final class State: Equatable, Hashable {
+
+
+public final class State: Equatable, Hashable {
 //        enum SuccessorExpandingError: Error {
 //            case stateIsAlreadyAmongSuccessors
 //        }
-        let name: String
-        let predicate: (Any) -> Bool
-        private(set) var availableSuccsessors: Set<State>
-        public func addSuccesorState(_ state: State...) /*throws*/ {
-            state.forEach({ state in
-                availableSuccsessors.insert(state)
-            })
-        }
-        public static func == (lhs: Stateful.State, rhs: Stateful.State) -> Bool {
-            return lhs.name == rhs.name
-        }
-        public func hash(into hasher: inout Hasher) {
-            hasher.combine(self.name)
-        }
-        init(name: String, predicate: @escaping (Any) -> Bool, validSuccsessors: Set<State>) {
-            self.name = name
-            self.predicate = predicate
-            self.availableSuccsessors = validSuccsessors
-        }
+    let name: String
+    let predicate: (Any) -> Bool
+    private(set) var availableSuccsessors: Set<State> = []
+    public  func addSuccesorState(_ state: State...) /*throws*/ {
+        state.forEach({ state in
+            availableSuccsessors.insert(state)
+        })
     }
-    public struct TransitionGraph {
-        let initialState: State
-        let setOfStates: Set<State>
+    public static func == (lhs: State, rhs: State) -> Bool {
+        return lhs.name == rhs.name
     }
-    private var value: T
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.name)
+    }
+    init(name: String, predicate: @escaping (Any) -> Bool) {
+        self.name = name
+        self.predicate = predicate
+    }
+}
+public struct TransitionGraph {
+    var initialState: State
+    let setOfStates: Set<State>
+}
+@propertyWrapper
+public struct Stateful<Value> {
+    private var value: Value
     private(set) var transitionGraph: Set<State>
     private(set) var currentState: State
-    public var wrappedValue: T {
+    public var wrappedValue: Value {
         get { value }
         set {
             var satisfied: Bool = false
@@ -185,8 +186,7 @@ public struct Stateful<T> {
             }
         }
     }
-    
-    public init(wrappedValue: T, configuration: TransitionGraph) {
+    public init(wrappedValue: Value, configuration: TransitionGraph) {
         self.currentState = configuration.initialState
         if self.currentState.predicate(wrappedValue) {
             self.value = wrappedValue
@@ -197,4 +197,10 @@ public struct Stateful<T> {
         }
         self.transitionGraph = configuration.setOfStates
     }
+}
+infix operator =>> : MultiplicationPrecedence
+@discardableResult
+func =>> (lhs: State, rhs: State) -> State {
+    lhs.addSuccesorState(rhs)
+    return rhs
 }

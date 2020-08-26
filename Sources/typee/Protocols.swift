@@ -5,6 +5,6 @@
 //  Created by aoAOAOoaooAOaoaoOAooaoAoaoaOAOoAoao on 8/26/20.
 //
 protocol StatefulType {
-    associatedtype StateRepresentingType: CaseIterable
+    associatedtype StateRepresentingType: Equatable
     var currentState: StateRepresentingType { get }
 }

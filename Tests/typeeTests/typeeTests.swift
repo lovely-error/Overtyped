@@ -60,25 +60,27 @@ final class typeeTests: XCTestCase {
             var secret: String = "The Kennedy was killed by ..."
             
             @Stateful(configuration: {
-                var emptyString = Stateful<String>.State(
+                let emptyString = State(
                     name: "empty string",
                     predicate: { value in
                         let a = value is String
                         let b = (value as! String).isEmpty
                         return a && b
-                    },
-                    validSuccsessors: [])
-                var nonEmptyString = Stateful<String>.State(
+                    })
+                let nonEmptyString = State(
                     name: "non empty string",
                     predicate: { value in
                         let a = value is String
                         let b = !(value as! String).isEmpty
                         return a && b
-                    },
-                    validSuccsessors: [])
-                emptyString.addSuccesorState(nonEmptyString)
-                nonEmptyString.addSuccesorState(emptyString)
-                return Stateful.TransitionGraph(initialState: emptyString, setOfStates: [emptyString, nonEmptyString])
+                    })
+//                emptyString.addSuccesorState(nonEmptyString)
+//                nonEmptyString.addSuccesorState(emptyString)
+                
+                emptyString =>> nonEmptyString
+                nonEmptyString =>> emptyString
+                
+                return TransitionGraph(initialState: emptyString, setOfStates: [emptyString, nonEmptyString])
             }())
             var emptyHalfOfTheTime = ""
         }
