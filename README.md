@@ -41,7 +41,7 @@ age = 1_000_000 //fatal error. People doesnt live that long yet.
 use(rareMaterial) //ok
 useOnceMore(rareMaterial) //opps! its gone...
 ```
-6. Stateful types - which are represented by a state machine. Transitions are described as a directed graph and only mutations are conidered to trigger transitions.
+5. Stateful types - which are represented by a state machine. Transitions are described as a directed graph and only mutations are conidered to trigger transitions.
 ```
 @Stateful(configuration: {
     let emptyString = State(
