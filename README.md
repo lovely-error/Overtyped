@@ -44,14 +44,14 @@ useOnceMore(rareMaterial) //opps! its gone...
 6. Stateful types - which are represented by a state machine. Transitions are described as a directed graph and only mutations are conidered to trigger transitions.
 ```
 @Stateful(configuration: {
-    let emptyString = Stateful<String>.State(
+    let emptyString = State(
         name: "empty string",
         predicate: { value in
             let a = value is String
             let b = (value as! String).isEmpty
             return a && b
         })
-    let nonEmptyString = Stateful<String>.State(
+    let nonEmptyString = State(
         name: "non empty string",
         predicate: { value in
             let a = value is String
@@ -61,7 +61,7 @@ useOnceMore(rareMaterial) //opps! its gone...
 
     emptyString =>> nonEmptyString =>> emptyString
     
-    return Stateful.TransitionGraph(initialState: emptyString)
+    return TransitionGraph(initialState: emptyString)
 }())
 var emptyHalfOfTheTime = ""
 emptyHalfOfTheTime = "!"
