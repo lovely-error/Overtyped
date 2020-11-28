@@ -34,8 +34,8 @@ fileToBeOpenedAndClosed.modifyContent { ... }
 
 3. Refined types - they are essentially type predicates, and ensure that value of a type meet requirements. For example, a name field in user record may be set to start with capital letter, and be longer than certain amount of character or not contain nonallphabetic symbols.
 ```
-@Constrained(by: {$0 > 0 $$ $0 < 150}) var age: Int = 19
-age = 1_000_000 //fatal error. People doesnt live that long yet.
+@Constrained(by: {$0 > 0 && $0 < 150}) var age: Int = 19
+age = 1_000_000 //fatal error. People dont live that long yet.
 ```
 
 4. Uniqueness types - you can use them only once, yeap that is all to them.
