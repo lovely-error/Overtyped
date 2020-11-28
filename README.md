@@ -1,4 +1,4 @@
-# typee
+# Overtyped
 
 We all love types, right? They allow us to capture errors early on and make our lifes more available to the rest of th great stuff out there.
 Indeed types are neat, and the types we all probably familiar with are the part of the Hindley-Milner type system of simply typed lambda calculus with polymorphisms, but while they definetly provide help, they are not what type systems and mathematical constructivism can offer. Namely, swift's property wrapper allow us to write the programm with more rigorous requirements and thus help us capture more bugs in our code. This library relies on these constructs:
