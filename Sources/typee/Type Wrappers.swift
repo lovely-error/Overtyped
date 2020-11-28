@@ -204,3 +204,71 @@ func =>> (lhs: State, rhs: State) -> State {
     lhs.addSuccesorState(rhs)
     return rhs
 }
+public enum MatchReport: Equatable, Hashable, ExpressibleByBooleanLiteral {
+   public typealias BooleanLiteralType = Bool
+   case allOk, violation
+   public init(booleanLiteral value: Bool) {
+      if value {
+         self = .allOk
+      } else {
+         self = .violation
+      }
+   }
+}
+@propertyWrapper
+public struct Modal<Value> {
+   public struct Condition {
+      let description: String
+      let condition: (Value) -> Bool
+      let check: (Value) -> MatchReport
+      let discardOption: DiscardOption
+   }
+   public enum DiscardOption {
+      case never, onCondition((Value) -> Bool)
+   }
+   private var value: Value
+   public var wrappedValue: Value {
+      mutating get {
+         if !activeTriggers.isEmpty {
+            for (idx, cond) in activeTriggers.enumerated() {
+               if cond.check(value) == .violation {
+                  fatalError("""
+                  Value \(value) violated condition that is '\(cond.description)'
+                  """)
+               }
+               if case DiscardOption.onCondition(let icond) = cond.discardOption {
+                  if icond(value) == true { activeTriggers.remove(at: idx) }
+               }
+            }
+         }
+         return value
+      }
+      set(nw) {
+         if !activeTriggers.isEmpty {
+            for (idx, cond) in activeTriggers.enumerated() {
+               if cond.check(nw) == .violation {
+                  fatalError("""
+                  Value \(value) violated condition that is '\(cond.description)'
+                  """)
+               }
+               if case DiscardOption.onCondition(let icond) = cond.discardOption {
+                  if icond(nw) == true { activeTriggers.remove(at: idx) }
+               }
+            }
+         }
+         for (idx, cond) in allConditions.enumerated() {
+            if cond.condition(nw) == true { activeTriggers.append(cond); allConditions.remove(at: idx) }
+         }
+         value = nw
+      }
+   }
+   private var activeTriggers: Array<Condition> = []
+   private var allConditions: Array<Condition>
+   public init (wrappedValue: Value, conditions: Array<Condition> = []) {
+      self.value = wrappedValue
+      allConditions = conditions
+   }
+   public mutating func nessecairily(after condition: @escaping (Value) -> Bool, ensure constraint: @escaping (Value) -> MatchReport, description: (Value) -> String, discardOption: DiscardOption = .never) {
+      allConditions.append(Condition.init(description: description(value), condition: condition, check: constraint, discardOption: discardOption))
+   }
+}
