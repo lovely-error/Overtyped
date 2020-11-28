@@ -268,7 +268,14 @@ public struct Modal<Value> {
       self.value = wrappedValue
       allConditions = conditions
    }
-   public mutating func nessecairily(after condition: @escaping (Value) -> Bool, ensure constraint: @escaping (Value) -> MatchReport, description: (Value) -> String, discardOption: DiscardOption = .never) {
-      allConditions.append(Condition.init(description: description(value), condition: condition, check: constraint, discardOption: discardOption))
+   public mutating func necessarily(
+      after condition: @escaping (Value) -> Bool,
+      ensure constraint: @escaping (Value) -> MatchReport,
+      description: (Value) -> String,
+      discard option: DiscardOption = .never
+   ) {
+      allConditions.append(Condition
+                              .init(description: description(value), condition: condition,
+                                    check: constraint, discardOption: option))
    }
 }
