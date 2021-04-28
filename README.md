@@ -1,7 +1,7 @@
 # Overtyped
 > To conceive of types as of something designating only a set of possible values an entity can be is correct;
 > the erroneous assumption is one that dictates this not to be considered about the whole programm.
-
+> *-- Me to Myself*
 
 To construct programms with some typing discipline being involved in the process is efficacious. You are a human and thus you make mistakes; thankfully to us all, a computer can aid you in preventing errors to contagiously propagate through your programm. Many techniques are possible, and you are familiar with at least one - to annotate expressions with tags. While useful, this solution is partial - you can only expect certain variables to be one of the possible values, and certainly, you cannot put constraints on how components of your programms interact. This package is an attempt to remediate the aforementioned issue. It affords six constructions to specify how variables must evolve during the execution.
 
