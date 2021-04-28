@@ -3,7 +3,7 @@
 > the erroneous assumption is one that dictates this not to be considered about the whole programm.
 
 
-To construct programms with some typing discipline being involved in the process is efficacious. You are a human and thus you make mistakes; thankfully to us all, a computer can aid you in preventing errors to contagiously propagate through your programm. Many techniques are possible, and you are familiar with at least one - to annotate expressions with tags. While useful, this solution is partial - you can only expect certain variables to be one of the possible values, and certainly, you cannot put constraints on how components of your programms interact. This package is an attempt to remediate the aforementioned issue. It affords six constructions to specify how variables must evolve during the execution of a programm.
+To construct programms with some typing discipline being involved in the process is efficacious. You are a human and thus you make mistakes; thankfully to us all, a computer can aid you in preventing errors to contagiously propagate through your programm. Many techniques are possible, and you are familiar with at least one - to annotate expressions with tags. While useful, this solution is partial - you can only expect certain variables to be one of the possible values, and certainly, you cannot put constraints on how components of your programms interact. This package is an attempt to remediate the aforementioned issue. It affords six constructions to specify how variables must evolve during the execution.
 
 1. Hoare functions - allow you to specify what your code should be before it gets into a function (this is named precondition check) - and what your code should be after it gets out of the function (this is named postcondition check).
 ```
@@ -19,8 +19,6 @@ viewTransformer(argument)
 
 2. Linear types - set the range of uses of values
 ```
-//if linear types were present in swift as a part of the type system,
-//they could be declared as such
 @Linear(range: ..1) var someProperty: Int = 123
 let a = someProperty \\ ok
 let b = someProperty \\ NOPE!
